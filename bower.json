@@ -1,0 +1,11 @@
+{
+  "name": "seed-project",
+  "description": "My seed angular project.",
+  "version": "1.0.0",
+  "private": "true",
+  "dependencies": {
+    "angular": "~1.4.6",
+    "angular-route": "~1.4.6",
+    "angular-animate": "~1.4.6"
+  }
+}

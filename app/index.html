@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang='pt-br'>
+	<head>
+		<meta charset='utf-8'/>
+		<meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=no'/>
+		<title>Angular Hello</title>
+		<link rel='stylesheet' href='assets/css/vendor/metro-icons.min.css'>
+		<link rel='stylesheet' href='assets/css/vendor/font-awesome.min.css'>
+		<link rel='stylesheet' href='assets/css/vendor/matadora.css'>
+		<link rel='stylesheet' href='assets/css/global.css'>
+		<script src='scripts/require.js' data-main='scripts/app'></script>
+	</head>
+	<body ng-controller='helloCtrl'>	 
+		<div class='loading-screen' ng-hide='loadingScreen'>
+			<img class='img-loading' src='assets/imgs/loading-screen.gif'/>
+		</div>   
+		<sidemenu-struct main-color="'black'" top-title="'Hello, World!'">
+			<div ng-view class='fade-view'></div></sidemenu-struct>
+	</body>
+</html>

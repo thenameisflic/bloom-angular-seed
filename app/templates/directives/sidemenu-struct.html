@@ -1,0 +1,41 @@
+<div class='sidemenu-struct'>
+	<div class='top fs-0' ng-style='{
+		"height": sidemenuTopHeight + "px",
+		"line-height": sidemenuTopHeight + "px",
+		"background-color": colorScheme[1],
+		"color": colorScheme[0]
+	}'>	
+		<div class='container-btn ib-m w-015'>
+			<a href='javascript:;' class='btn' ng-click='switchSidemenu()'
+				ng-style='{"color": colorScheme[0]}'><i class='fa fa-bars'></i></a>
+		</div>
+		<div class='container-title ib-m w-085'>
+			<span>{{topTitle}}</span>
+		</div>
+	</div>
+	<div class='overlayer' ng-click='switchSidemenu()' ng-style='{
+		"margin-top": sidemenuTopHeight + "px",
+		"background-color": colorScheme[2],
+		"display": sidemenuOverlayer.display
+	}'></div>
+	<div class='area-menu' ng-style='{
+		"top": sidemenuTopHeight + "px",
+		"left": sidemenuAreaMenu.left,
+		"background-color": colorScheme[2],
+		"color": colorScheme[0]
+	}'>
+		<div ng-include="'templates/partials/sidemenu-inner.html'"></div>
+	</div>
+	<div class='area-site'><div ng-transclude></div></div>
+</div>
+<style>
+	.sidemenu-struct>.area-menu .menu .btn {
+		color: {{colorScheme[0]}}; }
+	.sidemenu-struct>.area-menu .menu .btn:hover {
+		background-color: {{colorScheme[0]}};
+		color: {{colorScheme[3]}};
+	}
+	.sidemenu-struct>.area-menu .menu .title {
+		background-color: {{colorScheme[3]}};
+		color: {{colorScheme[0]}}; }
+</style>

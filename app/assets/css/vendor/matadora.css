@@ -1,0 +1,88 @@
+/*
+Matadora CSS Lib;
+Author: Luis Felipe Sousa;
+*/
+@import url(https://fonts.googleapis.com/css?family=Raleway:400,300,700);
+article, aside, details, figcaption, figure, fieldset,
+footer, header, hgroup, menu, nav, div, main, legend,
+form, a, span, pre, strong, h1, h2, h3, h4, h5, h6,
+ul, ol, li, table, td, tr, th, input, textarea, p,
+section, summary, button, optgroup, select, label { 
+	box-sizing: border-box; 
+}
+body{ 
+	position: absolute; margin: 0; width: 100%;
+	font-family: 'Raleway', sans-serif;
+}
+
+.ib-t { display: inline-block; vertical-align: top; }
+.ib-m { display: inline-block; vertical-align: middle; }
+.ib-b { display: inline-block; vertical-align: bottom; }
+.fs-0 { font-size: 0px; }
+.mw-1000 { max-width: 1000px; margin: auto; }
+
+.w-033 { width: 33.333333%; }
+.w-066 { width: 66.666666%; }
+
+.w-005 { width: 005%; } .w-010 { width: 010%; }
+.w-015 { width: 015%; } .w-020 { width: 020%; }
+.w-025 { width: 025%; } .w-030 { width: 030%; }
+.w-035 { width: 035%; } .w-040 { width: 040%; }
+.w-045 { width: 045%; } .w-050 { width: 050%; }
+.w-055 { width: 055%; } .w-060 { width: 060%; }
+.w-065 { width: 065%; } .w-070 { width: 070%; }
+.w-075 { width: 075%; } .w-080 { width: 080%; }
+.w-085 { width: 085%; } .w-090 { width: 090%; }
+.w-095 { width: 095%; } .w-100 { width: 100%; }
+
+.sidemenu-struct>.top,
+.sidemenu-struct>.area-menu,
+.sidemenu-struct>.overlayer { display: none; }
+
+@media all and (max-width: 1000px) { .mw-1000 { padding: 0 16px; } }
+@media all and (min-width: 0640px) { .lg-hide { display: none !important; } }
+@media all and (max-width: 0640px) {
+
+	.sm-hide { display: none !important; }	
+	.sm-w-033 { width: 33.333333%; }
+	.sm-w-066 { width: 66.666666%; }
+
+	.sm-w-005 { width: 005%; } .sm-w-010 { width: 010%; }
+	.sm-w-015 { width: 015%; } .sm-w-020 { width: 020%; }
+	.sm-w-025 { width: 025%; } .sm-w-030 { width: 030%; }
+	.sm-w-035 { width: 035%; } .sm-w-040 { width: 040%; }
+	.sm-w-045 { width: 045%; } .sm-w-050 { width: 050%; }
+	.sm-w-055 { width: 055%; } .sm-w-060 { width: 060%; }
+	.sm-w-065 { width: 065%; } .sm-w-070 { width: 070%; }
+	.sm-w-075 { width: 075%; } .sm-w-080 { width: 080%; }
+	.sm-w-085 { width: 085%; } .sm-w-090 { width: 090%; }
+	.sm-w-095 { width: 095%; } .sm-w-100 { width: 100%; }
+
+	.sidemenu-struct>.top,
+	.sidemenu-struct>.area-menu,
+	.sidemenu-struct>.overlayer { display: block; }
+
+	.sidemenu-struct>.top { position: fixed; width: 100%; top: 0; left: 0;
+		text-align: center; z-index: 99; }
+	.sidemenu-struct>.top .btn { font-size: 20px; display: inline-block;
+		width: 100%; }
+	.sidemenu-struct>.top .container-title { font-size: 18px; 
+		text-transform: uppercase; }
+	.sidemenu-struct>.overlayer { width: 100%; position: fixed; top: 0;
+		left: 0; height: 999999999px; z-index: 99; opacity: .5 }
+	.sidemenu-struct>.area-menu { position: fixed; width: 66%; transition: left .1s;
+		z-index: 99; overflow-x: hidden; overflow-y: auto; }
+	.sidemenu-struct>.area-menu .menu .ul-1 { padding: 0; margin: 0; }
+	.sidemenu-struct>.area-menu .menu .li-1 { display: block; }
+	.sidemenu-struct>.area-menu .menu .btn { font-size: 14px; display: block;
+		padding: 14px 16px; text-decoration: none; border: none; }
+	.sidemenu-struct>.area-menu .menu .btn:hover {		
+		border-right: 4px solid #19cfa6; 
+		font-weight: 700;
+	}
+	.sidemenu-struct>.area-menu .menu .btn .icon { font-size: 18px; margin-right: 16px; }
+	.sidemenu-struct>.area-menu .menu .title { font-size: 14px; display: block;
+		padding: 6px 0px; text-decoration: none; border: none; font-weight: 700;
+		text-align: center; }
+
+}
