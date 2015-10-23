@@ -76,7 +76,7 @@ gulp.task('styles', function() {
     .pipe(prefix({ cascade: true }))
     .pipe(rename(config.stylesFileName))
     .pipe(gulp.dest('build'))
-    .pipe(gulp.dest('public/stylesheets'));
+    .pipe(gulp.dest('public/styles'));
 });
 
 gulp.task('minify', ['styles'], function() {
@@ -86,7 +86,7 @@ gulp.task('minify', ['styles'], function() {
   return gulp.src('build/'+config.stylesFileName)
     .pipe(minifyCSS())
     .pipe(rename(minifiedStyleFileName))
-    .pipe(gulp.dest('public/stylesheets'));
+    .pipe(gulp.dest('public/styles'));
 });
 
 gulp.task('uglify', ['browserify-client'], function() {
