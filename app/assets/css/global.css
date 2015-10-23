@@ -1,8 +1,0 @@
-.fade-view.ng-enter { transition: .75s; opacity: 0; }
-.fade-view.ng-enter-active { opacity: 1; }
-.loading-screen { transition: .75s; position: fixed; width: 100%;
-    top: 0; right: 0; bottom: 0; left: 0; z-index: 999999;
-    font-size: 0px; background-color: #161616; text-align: center;
-} .loading-screen > .img-loading { 
-    position: absolute; top: 48%; margin-left: -42px; margin-top: -42px; 
-} .loading-screen.ng-hide { opacity: 0; }
