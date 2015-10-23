@@ -43,7 +43,7 @@ gulp.task('browserify-client', ['lint-client'], function() {
     }))
     .pipe(rename(config.mainFileName))
     .pipe(gulp.dest('build'))
-    .pipe(gulp.dest('public/javascripts'));
+    .pipe(gulp.dest('public/scripts'));
 });
 
 gulp.task('browserify-test', ['lint-test'], function() {
@@ -95,7 +95,7 @@ gulp.task('uglify', ['browserify-client'], function() {
   return gulp.src('build/'+config.mainFileName)
     .pipe(uglify())
     .pipe(rename(minifiedMainFileName))
-    .pipe(gulp.dest('public/javascripts'));
+    .pipe(gulp.dest('public/scripts'));
 });
 
 gulp.task('build', ['uglify', 'minify']);
