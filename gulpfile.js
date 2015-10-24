@@ -9,6 +9,9 @@ var config = {
 var gulp = require('gulp');
 var rename = require('gulp-rename');
 
+//Angular Dependencies
+var ngAnnotate = require('gulp-ng-annotate');
+
 // Build Dependencies
 var browserify = require('gulp-browserify');
 var uglify = require('gulp-uglify');
@@ -41,6 +44,7 @@ gulp.task('browserify-client', ['lint-client'], function() {
     .pipe(browserify({
       insertGlobals: true
     }))
+    .pipe(ngAnnotate())
     .pipe(rename(config.mainFileName))
     .pipe(gulp.dest('build'))
     .pipe(gulp.dest('public/scripts'));
