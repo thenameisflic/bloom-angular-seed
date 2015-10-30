@@ -3,13 +3,9 @@
   "description": "My seed angular project.",
   "version": "1.0.0",
   "dependencies": {
-    "angular": "^1.4.7",
-    "express": "^4.13.3",
-    "socket.io": "^1.3.7"
   },
   "devDependencies": {
     "browserify": "^11.2.0",
-    "browserify-shim": "^3.8.10",
     "chai": "^3.4.0",
     "gulp": "^3.9.0",
     "gulp-autoprefixer": "^3.1.0",
