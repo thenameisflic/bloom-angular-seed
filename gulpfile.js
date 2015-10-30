@@ -96,7 +96,7 @@ gulp.task('compile-test', function() {
     .pipe(gulp.dest(outputPaths.test));
 });
 
-gulp.task('reload-browsers', [], browserSync.reload);
+gulp.task('reload-browsers', [], function(){browserSync.reload;});
 
 gulp.task('serve', ['scripts', 'styles', 'test'], function () {
   browserSync.init({
