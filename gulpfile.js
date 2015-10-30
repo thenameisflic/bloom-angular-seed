@@ -11,6 +11,9 @@ var browserSync = require('browser-sync').create();
 // Test Dependencies
 var mochaPhantomjs = require('gulp-mocha-phantomjs');
 
+//Angular Dependencies
+var ngAnnotate = require('gulp-ng-annotate');
+
 var args = require('yargs')
   .alias('p', 'prod')
   .default('prod', false)
@@ -59,6 +62,7 @@ gulp.task('default', ['scripts', 'styles', 'test', 'watch']);
 // scripts - clean dist dir then annotate, minify, concat
 gulp.task('scripts', function() {
   gulp.src(inputPaths.scripts)
+    .pipe(ngAnnotate())
     .pipe(gulpif(args.prod, uglify())).on('error', gutil.log)
     .pipe(concat(files.jsBundle)).on('error', gutil.log)
     .pipe(gulp.dest(outputPaths.dist + outputPaths.scripts))
