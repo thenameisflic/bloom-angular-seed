@@ -89,10 +89,10 @@ gulp.task('watch', function() {
 
 gulp.task('compile-test', function() {
   return gulp.src(inputPaths.unit)
+    .pipe(concat(files.testBundle)).on('error', gutil.log)
     .pipe(browserify({
       insertGlobals: true
     }))
-    .pipe(concat(files.testBundle)).on('error', gutil.log)
     .pipe(gulp.dest(outputPaths.test));
 });
 
