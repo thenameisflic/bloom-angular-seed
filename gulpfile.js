@@ -7,6 +7,7 @@ var less = require('gulp-less');
 var minifyCss = require('gulp-minify-css');
 var browserify = require('gulp-browserify');
 var browserSync = require('browser-sync').create();
+var historyApiFallback = require('connect-history-api-fallback');
 
 // Test Dependencies
 var mochaPhantomjs = require('gulp-mocha-phantomjs');
@@ -100,7 +101,8 @@ gulp.task('reload-browsers', [], browserSync.reload);
 gulp.task('serve', ['scripts', 'styles', 'test'], function () {
   browserSync.init({
       server: {
-          baseDir: outputPaths.dist
+          baseDir: outputPaths.dist,
+          middleware: [ historyApiFallback() ]
       }
   });
 
