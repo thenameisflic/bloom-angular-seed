@@ -1,107 +1,111 @@
-'use strict';
-
-var config = {
-	mainFileName: 'bloom-angular-seed.js',
-	stylesFileName: 'bloom-angular-seed.css'
-};
-
-// Gulp Dependencies
 var gulp = require('gulp');
-var rename = require('gulp-rename');
-
-//Angular Dependencies
-var ngAnnotate = require('gulp-ng-annotate');
-
-// Build Dependencies
-var browserify = require('gulp-browserify');
+var gulpif = require('gulp-if');
+var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
-
-// Style Dependencies
+var gutil = require('gulp-util');
 var less = require('gulp-less');
-var prefix = require('gulp-autoprefixer');
-var minifyCSS = require('gulp-minify-css');
-
-// Development Dependencies
-var jshint = require('gulp-jshint');
+var minifyCss = require('gulp-minify-css');
+var browserify = require('gulp-browserify');
+var browserSync = require('browser-sync').create();
 
 // Test Dependencies
 var mochaPhantomjs = require('gulp-mocha-phantomjs');
 
-gulp.task('lint-client', function() {
-  return gulp.src('./client/**/*.js')
-    .pipe(jshint())
-    .pipe(jshint.reporter('default'));
+var args = require('yargs')
+  .alias('p', 'prod')
+  .default('prod', false)
+  .argv;
+
+var proj = {
+  public: './public/',
+  source: './client/',
+  lib: 'lib/',
+  static: 'static/',
+  scss: './scss/'
+};
+
+var tests = {
+  source: './test/',
+  unit: 'client/'
+};
+
+var files = {
+  jsBundle: 'bloom-angular-seed.min.js',
+  cssBundle: 'bloom-angular-seed.min.css',
+  testBundle: 'bloom-angular-seed.test.js'
+};
+
+var outputPaths = {
+  dist: proj.public,
+  test: tests.source,
+  scripts: 'js',
+  styles: 'css',
+  html : [ proj.public + '**/*.html' ] 
+};
+
+var inputPaths = {
+  html: [ proj.source + '*.html' ],
+  images: [ proj.source + 'img/**/*' ],
+  styles: [ proj.source + 'css/**/*.{css,less}' ],
+  scripts: [ proj.source + 'js/**/*.js', '!' + proj.source + 'js/' + files.jsbundle], // exclude the file we write too
+  statics: [ proj.source + proj.static + '**/*' ],
+  libs: [ proj.source + proj.lib + '**/*'],
+  less: [ proj.source + 'css/**/*.less' ],
+  unit: [ tests.source + tests.unit + '**/*test.js', '!' + outputPaths.test +  files.testBundle ]
+};
+
+gulp.task('default', ['scripts', 'styles', 'test', 'watch']);
+
+// scripts - clean dist dir then annotate, minify, concat
+gulp.task('scripts', function() {
+  gulp.src(inputPaths.scripts)
+    .pipe(gulpif(args.prod, uglify())).on('error', gutil.log)
+    .pipe(concat(files.jsBundle)).on('error', gutil.log)
+    .pipe(gulp.dest(outputPaths.dist + outputPaths.scripts))
+    .on('error', function (error) {
+      console.error('' + error);
+    });
 });
 
-gulp.task('lint-test', function() {
-  return gulp.src('./test/**/*.js')
-    .pipe(jshint())
-    .pipe(jshint.reporter('default'));
-});
-
-gulp.task('browserify-client', ['lint-client'], function() {
-  return gulp.src('client/index.js')
-    .pipe(browserify({
-      insertGlobals: true
-    }))
-    .pipe(ngAnnotate())
-    .pipe(rename(config.mainFileName))
-    .pipe(gulp.dest('build'))
-    .pipe(gulp.dest('public/scripts'));
-});
-
-gulp.task('browserify-test', ['lint-test'], function() {
-  return gulp.src('test/client/index.js')
-    .pipe(browserify({
-      insertGlobals: true
-    }))
-    .pipe(rename('client-test.js'))
-    .pipe(gulp.dest('build'));
+// styles - min app css then copy min css to dist
+gulp.task('styles', function() {
+  gulp.src(inputPaths.styles)
+    .pipe(gulpif(/[.]less$/, less())).on('error', gutil.log)
+    .pipe(minifyCss()).on('error', gutil.log)
+    .pipe(concat(files.cssBundle)).on('error', gutil.log)
+    .pipe(gulp.dest(outputPaths.dist + outputPaths.styles))
+    .pipe(browserSync.stream());
 });
 
 gulp.task('watch', function() {
-  gulp.watch('client/**/*.js', ['browserify-client']);
-  gulp.watch('test/client/**/*.js', ['browserify-test']);
+  gulp.watch(inputPaths.scripts, ['scripts', 'test']);
+  gulp.watch(inputPaths.styles, ['styles']);
 });
 
-gulp.task('test', ['lint-test', 'browserify-test'], function() {
-  return gulp.src('test/client/index.html')
+gulp.task('compile-test', function() {
+  return gulp.src(inputPaths.unit)
+    .pipe(browserify({
+      insertGlobals: true
+    }))
+    .pipe(concat(files.testBundle)).on('error', gutil.log)
+    .pipe(gulp.dest(outputPaths.test));
+});
+
+gulp.task('reload-browsers', [], browserSync.reload);
+
+gulp.task('serve', ['scripts', 'styles', 'test'], function () {
+  browserSync.init({
+      server: {
+          baseDir: outputPaths.dist
+      }
+  });
+
+  gulp.watch(inputPaths.scripts, ['scripts', 'test', 'reload-browsers']);
+  gulp.watch(inputPaths.styles, ['styles']);
+  gulp.watch(outputPaths.html, ['reload-browsers']);
+});
+
+gulp.task('test', ['compile-test'], function() {
+  return gulp.src(outputPaths.test + 'index.html')
     .pipe(mochaPhantomjs());
 });
-
-gulp.task('watch', function() {
-  gulp.watch('client/**/*.js', ['browserify-client', 'test']);
-  gulp.watch('test/client/**/*.js', ['test']);
-});
-
-gulp.task('styles', function() {
-  return gulp.src('client/less/index.less')
-    .pipe(less())
-    .pipe(prefix({ cascade: true }))
-    .pipe(rename(config.stylesFileName))
-    .pipe(gulp.dest('build'))
-    .pipe(gulp.dest('public/styles'));
-});
-
-gulp.task('minify', ['styles'], function() {
-	var splittedStyleFileName = config.stylesFileName.split('.');
-  console.log(splittedStyleFileName);
-	var minifiedStyleFileName = splittedStyleFileName[0] + '.min.'+splittedStyleFileName[1];
-  return gulp.src('build/'+config.stylesFileName)
-    .pipe(minifyCSS())
-    .pipe(rename(minifiedStyleFileName))
-    .pipe(gulp.dest('public/styles'));
-});
-
-gulp.task('uglify', ['browserify-client'], function() {
-  var splittedMainFileName = config.mainFileName.split('.');
-  var minifiedMainFileName = splittedMainFileName[0] + '.min.'+ splittedMainFileName[1];
-  return gulp.src('build/'+config.mainFileName)
-    .pipe(uglify())
-    .pipe(rename(minifiedMainFileName))
-    .pipe(gulp.dest('public/scripts'));
-});
-
-gulp.task('build', ['uglify', 'minify']);
-
-gulp.task('default', ['test', 'build', 'watch']);
