@@ -1,5 +1,5 @@
 {
-	"name": "bloom-js-seed",
+	"name": "bloom-angular-seed",
 	"src": "src",
 	"dist": "dist",
 	"test": "test"
