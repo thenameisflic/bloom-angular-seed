@@ -1,0 +1,6 @@
+{
+	"name": "bloom-js-seed",
+	"src": "src",
+	"dist": "dist",
+	"test": "test"
+}

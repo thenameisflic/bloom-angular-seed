@@ -1,117 +1,134 @@
 var gulp = require('gulp');
-var gulpif = require('gulp-if');
+var outline = require('./outline.json');
+
+gulp.task('default', ['build', 'watch']);
+gulp.task('build', ['style', 'script', 'index']);
+gulp.task('watch', WatchTask);
+gulp.task('style', StyleTask);
+gulp.task('script', ScriptTask);
+gulp.task('index', IndexTask);
+gulp.task('start-server', StartServerTask);
+gulp.task('reload-browser', ReloadBrowserTask);
+gulp.task('prepare-tests', PrepareTestsTask);
+gulp.task('index-tests', IndexTestsTask);
+gulp.task('run-tests', ['prepare-tests', 'index-tests'], RunTestsTask);
+
 var concat = require('gulp-concat');
-var uglify = require('gulp-uglify');
 var gutil = require('gulp-util');
-var less = require('gulp-less');
-var minifyCss = require('gulp-minify-css');
-var browserify = require('gulp-browserify');
-var browserSync = require('browser-sync').create();
-var historyApiFallback = require('connect-history-api-fallback');
-
-// Test Dependencies
-var mochaPhantomjs = require('gulp-mocha-phantomjs');
-
-//Angular Dependencies
-var ngAnnotate = require('gulp-ng-annotate');
+var browserSync = require('browser-sync');
 
 var args = require('yargs')
   .alias('p', 'prod')
   .default('prod', false)
   .argv;
 
-var proj = {
-  public: './public/',
-  source: './client/',
-  lib: 'lib/',
-  static: 'static/',
-  scss: './scss/'
-};
+var minifyCss = require('gulp-minify-css');
+var gulpif = require('gulp-if');
 
-var tests = {
-  source: './test/',
-  unit: 'client/'
-};
+function StyleTask () {
+	return gulp.src(outline.src + '/css/**/*.css')
+			.pipe(concat(withMinCSS(outline.name))).on('error', gutil.log)
+			.pipe(minifyCss()).on('error', gutil.log)
+			.pipe(gulp.dest(outline.dist + '/css/')).on('error', gutil.log)
+			.pipe(browserSync.stream());
+}
 
-var files = {
-  jsBundle: 'bloom-angular-seed.min.js',
-  cssBundle: 'bloom-angular-seed.min.css',
-  testBundle: 'bloom-angular-seed.test.js'
-};
+var uglify = require('gulp-uglify');
 
-var outputPaths = {
-  dist: proj.public,
-  test: tests.source,
-  scripts: 'js',
-  styles: 'css',
-  html : [ proj.public + '**/*.html' ] 
-};
+function ScriptTask () {
+	return gulp.src(outline.src + '/js/**/*.js')
+			.pipe(concat(withMinJS(outline.name))).on('error', gutil.log)
+			.pipe(gulpif(args.prod, uglify())).on('error', gutil.log)
+			.pipe(gulp.dest(outline.dist + '/js/')).on('error', gutil.log);
+}
 
-var inputPaths = {
-  html: [ proj.source + '*.html' ],
-  images: [ proj.source + 'img/**/*' ],
-  styles: [ proj.source + 'css/**/*.{css,less}' ],
-  scripts: [ proj.source + 'js/**/*.js', '!' + proj.source + 'js/' + files.jsbundle], // exclude the file we write too
-  statics: [ proj.source + proj.static + '**/*' ],
-  libs: [ proj.source + proj.lib + '**/*'],
-  less: [ proj.source + 'css/**/*.less' ],
-  unit: [ tests.source + tests.unit + '**/*test.js', '!' + outputPaths.test +  files.testBundle ]
-};
+var inject = require('gulp-inject');
+var htmlreplace = require('gulp-html-replace');
+var bowerFiles = require('main-bower-files');
 
-gulp.task('default', ['scripts', 'styles', 'test', 'watch']);
+var jsBundle = outline.dist + '/js/' + withMinJS(outline.name);
+var cssBundle = outline.dist + '/css/' + withMinCSS(outline.name);
 
-// scripts - clean dist dir then annotate, minify, concat
-gulp.task('scripts', function() {
-  gulp.src(inputPaths.scripts)
-    .pipe(ngAnnotate())
-    .pipe(gulpif(args.prod, uglify())).on('error', gutil.log)
-    .pipe(concat(files.jsBundle)).on('error', gutil.log)
-    .pipe(gulp.dest(outputPaths.dist + outputPaths.scripts))
-    .on('error', function (error) {
-      console.error('' + error);
-    });
-});
+function IndexTask () {
+	var defaultInjectionOptions = {
+		addRootSlash: false,
+		ignorePath: '/' + outline.dist,
+		name: 'inject'
+	};
 
-// styles - min app css then copy min css to dist
-gulp.task('styles', function() {
-  gulp.src(inputPaths.styles)
-    .pipe(gulpif(/[.]less$/, less())).on('error', gutil.log)
-    .pipe(minifyCss()).on('error', gutil.log)
-    .pipe(concat(files.cssBundle)).on('error', gutil.log)
-    .pipe(gulp.dest(outputPaths.dist + outputPaths.styles))
-    .pipe(browserSync.stream());
-});
+	var bowerInjectionOptions = {
+		addRootSlash: false,
+		ignorePath: '/' + outline.dist,
+		name: 'bower'
+	};
 
-gulp.task('watch', function() {
-  gulp.watch(inputPaths.scripts, ['scripts', 'test']);
-  gulp.watch(inputPaths.styles, ['styles']);
-});
+	return gulp.src(outline.src + '/html/index.html')
+  			.pipe(htmlreplace({'appTitle': outline.name}))
+  			.pipe(inject(gulp.src(bowerFiles(), {read: false}), bowerInjectionOptions))
+  			.pipe(inject(gulp.src(jsBundle, {read: false}), defaultInjectionOptions))
+  			.pipe(inject(gulp.src(cssBundle, {read: false}), defaultInjectionOptions))
+  			.pipe(gulp.dest(outline.dist));
+}
 
-gulp.task('compile-test', function() {
-  return gulp.src(inputPaths.unit)
-    .pipe(concat(files.testBundle)).on('error', gutil.log)
-    .pipe(browserify({
-      insertGlobals: true
-    }))
-    .pipe(gulp.dest(outputPaths.test));
-});
+function ReloadBrowserTask () {
+	browserSync.reload();
+}
 
-gulp.task('reload-browsers', [], function(){browserSync.reload;});
-
-gulp.task('serve', ['scripts', 'styles', 'test'], function () {
-  browserSync.init({
+var historyApiFallback = require('connect-history-api-fallback');
+function StartServerTask () {
+	browserSync.init({
       server: {
-          baseDir: outputPaths.dist,
+          baseDir: outline.dist,
           middleware: [ historyApiFallback() ]
       }
   });
+}
 
-  gulp.watch(inputPaths.scripts, ['scripts', 'test', 'reload-browsers']);
-  gulp.watch(inputPaths.styles, ['styles']);
-  gulp.watch(outputPaths.html, ['reload-browsers']);
-});
+function WatchTask () {
+	StartServerTask();
 
-gulp.task('test', ['compile-test'], function() {
-  return gulp.src(outputPaths.test + 'index.html')
+	gulp.watch(outline.src + '/js/**/*.js', ['script', 'reload-browser', 'run-tests']);
+	gulp.watch(outline.test + '/unit/**/*.test.js', ['run-tests']);
+  	gulp.watch(outline.src + '/css/**/*.css', ['style']);
+  	gulp.watch(outline.src + '/html/**/*.html', ['index', 'reload-browser']);
+  	gulp.watch(outline.src + '/lib/**/*.{js,css}', ['index', 'reload-browser']);
+}
+
+function PrepareTestsTask () {
+	return gulp.src(outline.test + '/unit/**/*.test.js')
+		    .pipe(concat(outline.test + '/runnable/' + outline.name + '.test.js')).on('error', gutil.log)
+		    .pipe(gulp.dest(''));
+}
+
+function IndexTestsTask () {
+	var defaultTestInjectionOptions = {
+		    addRootSlash: false,
+		    relative: true,
+		    name: 'inject'
+	};
+	var bowerTestInjectionOptions = {
+		    addRootSlash: false,
+		    relative: true,
+		    name: 'bower'
+	};
+	return gulp.src(outline.test + '/unit/index.html')
+			.pipe(htmlreplace({'testFile': outline.name + '.test.js'}))
+			.pipe(inject(gulp.src(bowerFiles(), {read: false}), bowerTestInjectionOptions))
+			.pipe(inject(gulp.src(outline.dist + '/js/' + withMinJS(outline.name), {read: false}), defaultTestInjectionOptions))
+			.pipe(gulp.dest(outline.test + '/runnable'));
+}
+
+var mochaPhantomjs = require('gulp-mocha-phantomjs');
+
+function RunTestsTask () {
+	return gulp.src(outline.test + '/runnable/index.html')
     .pipe(mochaPhantomjs());
-});
+}
+
+function withMinJS (file) {
+	return file + '.min.js';
+}
+
+function withMinCSS (file) {
+	return file + '.min.css';
+}
