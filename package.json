@@ -3,7 +3,7 @@
   "description": "My seed angular project.",
   "version": "1.0.0",
   "dependencies": {
-    "gulp-html-replace": "^1.5.4"
+    
   },
   "devDependencies": {
     "browser-sync": "^2.9.11",
@@ -20,6 +20,7 @@
     "gulp-util": "^3.0.7",
     "main-bower-files": "^2.9.0",
     "mocha": "^2.3.3",
-    "yargs": "^3.29.0"
+    "yargs": "^3.29.0",
+    "gulp-html-replace": "^1.5.4"
   }
 }
