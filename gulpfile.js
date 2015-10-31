@@ -35,10 +35,12 @@ function StyleTask () {
 
 var uglify = require('gulp-uglify');
 var replace = require('gulp-replace');
+var ngAnnotate = require('gulp-ng-annotate');
 
 function ScriptTask () {
 	return gulp.src(outline.src + '/js/**/*.js')
 			.pipe(concat(withMinJS(outline.name))).on('error', gutil.log)
+			.pipe(ngAnnotate())
 			.pipe(replace('GR-APP-TITLE', outline.name))
 			.pipe(gulpif(args.prod, uglify())).on('error', gutil.log)
 			.pipe(gulp.dest(outline.dist + '/js/')).on('error', gutil.log);
