@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "dependencies": {},
   "devDependencies": {
+    "angular-mocks": "^1.4.7",
     "browser-sync": "^2.9.11",
     "chai": "^3.4.0",
     "connect-history-api-fallback": "^1.1.0",
