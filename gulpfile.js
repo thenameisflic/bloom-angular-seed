@@ -1,5 +1,6 @@
 var gulp = require('gulp');
 var outline = require('./outline.json');
+var endpoints = require('./endpoints.json');
 
 gulp.task('default', ['build', 'watch']);
 gulp.task('build', ['style', 'script', 'index']);
@@ -19,7 +20,9 @@ var browserSync = require('browser-sync');
 
 var args = require('yargs')
   .alias('p', 'prod')
+  .alias('i', 'int')
   .default('prod', false)
+  .default('int', false)
   .argv;
 
 var minifyCss = require('gulp-minify-css');
@@ -38,7 +41,7 @@ var replace = require('gulp-replace');
 var ngAnnotate = require('gulp-ng-annotate');
 
 function ScriptTask () {
-	return gulp.src(outline.src + '/js/**/*.js')
+	return injectEndpoints(gulp.src(outline.src + '/js/**/*.js'))
 			.pipe(concat(withMinJS(outline.name))).on('error', gutil.log)
 			.pipe(ngAnnotate())
 			.pipe(replace('GR-APP-TITLE', outline.name))
@@ -99,7 +102,7 @@ function WatchTask () {
 }
 
 function PrepareTestsTask () {
-	return gulp.src(outline.test + '/unit/**/*.test.js')
+	return injectEndpoints(gulp.src(outline.test + '/unit/**/*.test.js'))
 		    .pipe(concat(outline.test + '/runnable/' + outline.name + '.test.js')).on('error', gutil.log)
 		    .pipe(gulp.dest(''));
 }
@@ -120,6 +123,23 @@ function IndexTestsTask () {
 			.pipe(inject(gulp.src(bowerFiles(), {read: false}), bowerTestInjectionOptions))
 			.pipe(inject(gulp.src(outline.dist + '/js/' + withMinJS(outline.name), {read: false}), defaultTestInjectionOptions))
 			.pipe(gulp.dest(outline.test + '/runnable'));
+}
+
+function injectEndpoints (inputStream) {
+  var env;
+  if (args.prod || args.int){
+    env = 'prod';
+  }
+  else {
+    env = 'dev';
+  }
+  var outputStream = inputStream;
+  for (var key in endpoints[env]) {
+    if (endpoints[env].hasOwnProperty(key)) {
+      outputStream = outputStream.pipe(replace(key, endpoints[env][key]));
+    }
+  }
+  return outputStream;
 }
 
 var mochaPhantomjs = require('gulp-mocha-phantomjs');
