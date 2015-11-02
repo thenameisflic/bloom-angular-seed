@@ -13,6 +13,7 @@ gulp.task('reload-browser', ReloadBrowserTask);
 gulp.task('prepare-tests', PrepareTestsTask);
 gulp.task('index-tests', IndexTestsTask);
 gulp.task('run-tests', ['prepare-tests', 'index-tests'], RunTestsTask);
+gulp.task('templateCache', TemplateCache);
 
 var concat = require('gulp-concat');
 var gutil = require('gulp-util');
@@ -69,12 +70,19 @@ function IndexTask () {
 		name: 'bower'
 	};
 
-	return gulp.src(outline.src + '/html/index.html')
+	return gulp.src(outline.src + '/index.html')
   			.pipe(htmlreplace({'appTitle': outline.name}))
   			.pipe(inject(gulp.src(bowerFiles(), {read: false}), bowerInjectionOptions))
   			.pipe(inject(gulp.src(jsBundle, {read: false}), defaultInjectionOptions))
   			.pipe(inject(gulp.src(cssBundle, {read: false}), defaultInjectionOptions))
   			.pipe(gulp.dest(outline.dist));
+}
+
+var templateCache = require('gulp-angular-templatecache');
+function TemplateCache () {
+	return gulp.src(outline.src + '/html/**/*.html')
+    .pipe(templateCache({standalone:true})).on('error', gutil.log)
+    .pipe(gulp.dest(outline.dist + '/js'));
 }
 
 function ReloadBrowserTask () {
@@ -97,7 +105,7 @@ function WatchTask () {
 	gulp.watch(outline.src + '/js/**/*.js', ['script', 'reload-browser', 'run-tests']);
 	gulp.watch(outline.test + '/unit/**/*.test.js', ['run-tests']);
   	gulp.watch(outline.src + '/css/**/*.css', ['style']);
-  	gulp.watch(outline.src + '/html/**/*.html', ['index', 'reload-browser']);
+  	gulp.watch(outline.src + '/**/*.html', ['index', 'reload-browser']);
   	gulp.watch(outline.src + '/lib/**/*.{js,css}', ['index', 'reload-browser']);
 }
 
