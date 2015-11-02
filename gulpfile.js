@@ -71,7 +71,7 @@ function IndexTask () {
 	};
 
 	return gulp.src(outline.src + '/index.html')
-  			.pipe(htmlreplace({'appTitle': outline.name}))
+  			.pipe(htmlreplace({'appTitle': outline.name, 'templatingCache': 'js/templates.js'}))
   			.pipe(inject(gulp.src(bowerFiles(), {read: false}), bowerInjectionOptions))
   			.pipe(inject(gulp.src(jsBundle, {read: false}), defaultInjectionOptions))
   			.pipe(inject(gulp.src(cssBundle, {read: false}), defaultInjectionOptions))
