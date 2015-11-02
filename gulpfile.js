@@ -3,7 +3,7 @@ var outline = require('./outline.json');
 var endpoints = require('./endpoints.json');
 
 gulp.task('default', ['build', 'watch']);
-gulp.task('build', ['style', 'script', 'index']);
+gulp.task('build', ['templateCache', 'style', 'script', 'index']);
 gulp.task('watch', WatchTask);
 gulp.task('style', StyleTask);
 gulp.task('script', ScriptTask);
@@ -127,7 +127,7 @@ function IndexTestsTask () {
 		    name: 'bower'
 	};
 	return gulp.src(outline.test + '/unit/index.html')
-			.pipe(htmlreplace({'testFile': outline.name + '.test.js'}))
+			.pipe(htmlreplace({'testFile': outline.name + '.test.js', 'templatingCache': '../../'+outline.dist+'/js/templates.js'}))
 			.pipe(inject(gulp.src(bowerFiles(), {read: false}), bowerTestInjectionOptions))
 			.pipe(inject(gulp.src(outline.dist + '/js/' + withMinJS(outline.name), {read: false}), defaultTestInjectionOptions))
 			.pipe(gulp.dest(outline.test + '/runnable'));
