@@ -30,7 +30,7 @@ var minifyCss = require('gulp-minify-css');
 var gulpif = require('gulp-if');
 
 function StyleTask () {
-	return gulp.src(outline.src + '/css/**/*.css')
+	return gulp.src(outline.src + '/**/*.css')
 			.pipe(concat(withMinCSS(outline.name))).on('error', gutil.log)
 			.pipe(minifyCss()).on('error', gutil.log)
 			.pipe(gulp.dest(outline.dist + '/css/')).on('error', gutil.log)
@@ -42,7 +42,7 @@ var replace = require('gulp-replace');
 var ngAnnotate = require('gulp-ng-annotate');
 
 function ScriptTask () {
-	return injectEndpoints(gulp.src(outline.src + '/js/**/*.js'))
+	return injectEndpoints(gulp.src(outline.src + '/**/*.js'))
 			.pipe(concat(withMinJS(outline.name))).on('error', gutil.log)
 			.pipe(ngAnnotate())
 			.pipe(replace('GR-APP-TITLE', outline.name))
@@ -80,7 +80,7 @@ function IndexTask () {
 
 var templateCache = require('gulp-angular-templatecache');
 function TemplateCache () {
-	return gulp.src(outline.src + '/html/**/*.html')
+	return gulp.src(outline.src + '/**/*.html')
     .pipe(templateCache({standalone:true})).on('error', gutil.log)
     .pipe(gulp.dest(outline.dist + '/js'));
 }
@@ -102,10 +102,10 @@ function StartServerTask () {
 function WatchTask () {
 	StartServerTask();
 
-	gulp.watch(outline.src + '/js/**/*.js', ['script', 'reload-browser', 'run-tests']);
+	gulp.watch(outline.src + '/**/*.js', ['script', 'templateCache','reload-browser', 'run-tests']);
 	gulp.watch(outline.test + '/unit/**/*.test.js', ['run-tests']);
-  	gulp.watch(outline.src + '/css/**/*.css', ['style']);
-  	gulp.watch(outline.src + '/**/*.html', ['index', 'reload-browser']);
+  	gulp.watch(outline.src + '/**/*.css', ['style']);
+  	gulp.watch(outline.src + '/**/*.html', ['index', 'templateCache', 'reload-browser']);
   	gulp.watch(outline.src + '/lib/**/*.{js,css}', ['index', 'reload-browser']);
 }
 
