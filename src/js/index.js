@@ -1,4 +1,5 @@
 (function () {
-	angular.module('GR-APP-TITLE', ['templates']);
+	angular.module('GR-APP-TITLE', ['templates',
+									'ui.router']);
 	
 })();
